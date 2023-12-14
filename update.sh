@@ -9,10 +9,10 @@ parametro="$3"
 copia(){
 
     #variabili locali
-    source=$1
-    destination=$2
-    flagR=$3
-    flagI=$4
+    source="$1"
+    destination="$2"
+    flagR="$3"
+    flagI="$4"
 
     #ciclo for each per gli elementi presenti
     for files in "$source"/*
@@ -45,6 +45,17 @@ copia(){
                         cp "$files" "$destination"
                     fi
                 fi
+            fi
+        fi
+        #parte ricorsiva se la flag è true
+        if [[ (-d "$files") && ("$flagR" == 1) ]]; then
+            echo "test1"
+            #controllo che la cartella non esita gia nella destinazione
+            if [[ "$source"/"$(basename "$files")" == "$destination"/"$(basename "$files")" ]]; then
+                copia "$source"/"$(basename "$files")" "$destination"/"$(basename "$files")" "$flagR" "$flagI"
+            else
+                mkdir "$destination"/"$(basename "$files")"
+                copia "$source"/"$(basename "$files")" "$destination"/"$(basename "$files")" "$flagR" "$flagI"
             fi
         fi
     done
@@ -89,22 +100,24 @@ fi
 #funziona in maniera unidirezionale quindi ciclo i file della prima e non viceversa
 
 case "$parametro" in
+    #chiamo la funzione in ricorsiva
     [-R][-r]* )
-
+    copia "$dir1" "$dir2" "1" "0"; echo ciao
     ;;
-
-    [-I][-i]* )
+    
     #chiamo la funzione copia con la conferma
-    copia "$dir1" "$dir2" "" "1"
+    [-I][-i]* )
+    copia "$dir1" "$dir2" "0" "1"
     ;;
-
+    
+    #chiamo la funzione con il prompt e la ricorsivita'
     [-IR][-ir][-RI][-ri]* )
-
+    copia "$dir1" "$dir2" "1" "1"
     ;;
 
+    #chiamo la funzione base
     *)
-    #chiamo la funzione copia
-    copia "$dir1" "$dir2"
+    copia "$dir1" "$dir2" "0" "0"
     ;;
     
 esac
