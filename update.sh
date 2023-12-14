@@ -5,6 +5,51 @@ dir1="$1"
 dir2="$2"
 parametro="$3"
 
+#funzione per copiare
+copia(){
+
+    #variabili locali
+    source=$1
+    destination=$2
+    flagR=$3
+    flagI=$4
+
+    #ciclo for each per gli elementi presenti
+    for files in "$source"/*
+    do
+        #controllo che il file sia un file regolare
+        if [[ -f "$files" ]]; then
+            #controllo che il file esista se non esiste lo copio
+            if [[ ! (-e "$destination"/"$(basename "$files")") ]]; then
+                if [[ $flagI == 1 ]]; then
+                    echo "vuoi copirare il $files in $destination ? y/n"
+                    read conferma
+                    if [[ ("$conferma" == y) || ("$conferma" == Y) ]]; then
+                        cp "$files" "$destination"
+                    fi
+                else
+                    cp "$files" "$destination"
+                fi
+                
+            else
+                #se il file esiste controllo che quello che voglio copiare sia piu'
+                #recente di quello nella destinazione
+                if [[ "$files" -nt "$destination"/$(basename "$files") ]]; then
+                    if [[ $flagI == 1 ]]; then
+                        echo "vuoi copirare il $files in $destination ? y/n"
+                        read conferma
+                        if [[ ("$conferma" == y) || ("$conferma" == Y) ]]; then
+                            cp "$files" "$destination"
+                        fi
+                    else
+                        cp "$files" "$destination"
+                    fi
+                fi
+            fi
+        fi
+    done
+}
+
 #assegno l'output di dirname a due variabili
 full_dir1=$(dirname "$dir1")
 full_dir2=$(dirname "$dir2")
@@ -40,79 +85,26 @@ if [[ "$full_dir1" != "$full_dir2" ]]; then
     exit
 fi
 
-#assegno  i pathname della prima dir ad un array
-for files in "$dir1"/*
-    do
-        files_dir1[i]="$files"
-        ((i++))
-    done
-
-#faccio la stessa cosa ma per la seconda dir
-for files in "$dir2"/*
-    do
-        files_dir2[i]="$files"
-        ((i++))
-    done
-
 #ciclo for per iterare i file della prima dir
 #funziona in maniera unidirezionale quindi ciclo i file della prima e non viceversa
 
 case "$parametro" in
     [-R][-r]* )
-    
-    ;;
-    [-I][-i]* )
-        for i in "${!files_dir1[@]}"
-        do
-            #controllo che il file sia un file regolare
-            if [[ -f ${files_dir1[i]} ]]; then
-                    #controllo che il file sia gia presente, se lo e' controllo se il file che voglio copiare
-                    #e' piu' recente del secondo se lo e' lo copio senno vado avanti
-                if [[ (${files_dir1[i]} == ${files_dir2[i]}) && (${files_dir1[i]} -nt ${files_dir2[i]}) ]]; then
-                    while true; do
-                        read -p "Vuoi sovrascrivere il file ${files_dir1[i]} con il file ${files_dir2[i]}? y/n" yesno
-                            case $yesno in
-                                [Yy]* ) cp "${files_dir1[i]}" "$dir2"; break;;
-                                [Nn]* ) break;;
-                                    * ) echo "inserisci y(si) o n(no)!!!";;
-                            esac
-                    done
-                fi
-                #copio i file che non sono gia presenti
-                if [[ ${files_dir1[i]} != ${files_dir2[i]} ]]; then
-                    while true; do
-                        echo "Vuoi copiare il file ${files_dir1[i]} in $dir2? y/n"
-                        read yesno
-                            case $yesno in
-                                [Yy]* ) cp "${files_dir1[i]}" "$dir2"; break;;
-                                [Nn]* ) break;;
-                                    * ) echo "inserisci y(si) o n(no)!!!";;
-                            esac
-                    done
-                fi
-            fi    
-        done
 
     ;;
+
+    [-I][-i]* )
+    #chiamo la funzione copia con la conferma
+    copia "$dir1" "$dir2" "" "1"
+    ;;
+
     [-IR][-ir][-RI][-ri]* )
 
     ;;
+
     *)
-    for i in "${!files_dir1[@]}" 
-        do
-            #controllo che il file sia un file regolare
-            if [[ -f ${files_dir1[i]} ]]; then
-                #controllo che il file sia gia presente, se lo e' controllo se il file che voglio copiare
-                #e' piu' recente del secondo se lo e' lo copio senno vado avanti
-                if [[ (${files_dir1[i]} == ${files_dir2[i]}) && (${files_dir1[i]} -nt ${files_dir2[i]}) ]]; then
-                    cp "${files_dir1[i]}" "$dir2"
-                fi
-                #copio i file che non sono gia presenti
-                if [[ ${files_dir1[i]} != ${files_dir2[i]} ]]; then
-                    cp "${files_dir1[i]}" "$dir2"
-                fi
-            fi
-        done
+    #chiamo la funzione copia
+    copia "$dir1" "$dir2"
     ;;
     
 esac
