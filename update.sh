@@ -21,13 +21,17 @@ copia(){
         if [[ -f "$files" ]]; then
             #controllo che il file esista se non esiste lo copio
             if [[ ! (-e "$destination"/"$(basename "$files")") ]]; then
+                #parte del opzione conferma, entra solo se flagI e' uguale a 1
                 if [[ $flagI == 1 ]]; then
-                    echo "vuoi copirare il $files in $destination ? y/n"
-                    read conferma
+                    while [ "$conferma" != "n" ] && [ "$conferma" != "N" ] && [ "$conferma" != "y" ] && [ "$conferma" != "Y" ]; do
+                        echo "vuoi copiare il $files in $destination ? y/n"
+                        read conferma
+                    done
                     if [[ ("$conferma" == y) || ("$conferma" == Y) ]]; then
                         cp "$files" "$destination"
                     fi
                 else
+                #se la flag non è uguale a 1, copia senza chiedere conferma
                     cp "$files" "$destination"
                 fi
                 
@@ -35,25 +39,31 @@ copia(){
                 #se il file esiste controllo che quello che voglio copiare sia piu'
                 #recente di quello nella destinazione
                 if [[ "$files" -nt "$destination"/$(basename "$files") ]]; then
+                    #parte del opzione conferma, entra solo se flagI e' uguale a 1
                     if [[ $flagI == 1 ]]; then
-                        echo "vuoi copirare il $files in $destination ? y/n"
+                        while [ "$conferma" != "n" ] && [ "$conferma" != "N" ] && [ "$conferma" != "y" ] && [ "$conferma" != "Y" ]; do
+                        echo "vuoi copiare il $files in $destination ? y/n"
                         read conferma
+                    done
                         if [[ ("$conferma" == y) || ("$conferma" == Y) ]]; then
                             cp "$files" "$destination"
                         fi
                     else
+                    #se la flag non è uguale a 1, copia senza chiedere conferma
                         cp "$files" "$destination"
                     fi
                 fi
             fi
         fi
-        #parte ricorsiva se la flag è true
+        #parte ricorsiva se la flagR è uguale a 1
         if [[ (-d "$files") && ("$flagR" == 1) ]]; then
-            echo "test1"
-            #controllo che la cartella non esita gia nella destinazione
-            if [[ "$source"/"$(basename "$files")" == "$destination"/"$(basename "$files")" ]]; then
+            #controllo che la cartella non esista gia nella destinazione
+            #se esiste copio i file richiamando la funzione "copia"
+            if [[ -e "$destination"/"$(basename "$files")" ]]; then
                 copia "$source"/"$(basename "$files")" "$destination"/"$(basename "$files")" "$flagR" "$flagI"
             else
+            #se la cartella non esiste nella destinazione la creo
+            #poi richiamo la funzione "copia"
                 mkdir "$destination"/"$(basename "$files")"
                 copia "$source"/"$(basename "$files")" "$destination"/"$(basename "$files")" "$flagR" "$flagI"
             fi
@@ -96,13 +106,11 @@ if [[ "$full_dir1" != "$full_dir2" ]]; then
     exit
 fi
 
-#ciclo for per iterare i file della prima dir
-#funziona in maniera unidirezionale quindi ciclo i file della prima e non viceversa
-
+#switch case per le opzioni -r -i
 case "$parametro" in
-    #chiamo la funzione in ricorsiva
+    #chiamo la funzione in maniera ricorsiva
     [-R][-r]* )
-    copia "$dir1" "$dir2" "1" "0"; echo ciao
+    copia "$dir1" "$dir2" "1" "0"
     ;;
     
     #chiamo la funzione copia con la conferma
