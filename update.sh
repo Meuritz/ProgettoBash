@@ -21,35 +21,38 @@ copia(){
         if [[ -f "$files" ]]; then
             #controllo che il file esista se non esiste lo copio
             if [[ ! (-e "$destination"/"$(basename "$files")") ]]; then
-                #parte del opzione conferma, entra solo se flagI e' uguale a 1
+                #opzione conferma( solo se il flagI è uguale a 1)
                 if [[ $flagI == 1 ]]; then
-                    while [ "$conferma" != "n" ] && [ "$conferma" != "N" ] && [ "$conferma" != "y" ] && [ "$conferma" != "Y" ]; do
-                        echo "vuoi copiare il $files in $destination ? y/n"
-                        read conferma
-                    done
-                    if [[ ("$conferma" == y) || ("$conferma" == Y) ]]; then
-                        cp "$files" "$destination"
-                    fi
+                     while true; do
+                            echo "Vuoi copiare il file $files in $destination? y/n"
+                            read conferma
+                                case $conferma in
+                                    [Yy]* ) cp "$files" "$destination"; break;;
+                                    [Nn]* ) break;;
+                                        * ) echo "inserisci y(si) o n(no)!!!";;
+                                esac
+                        done
                 else
                 #se la flag non è uguale a 1, copia senza chiedere conferma
                     cp "$files" "$destination"
                 fi
-                
             else
                 #se il file esiste controllo che quello che voglio copiare sia piu'
-                #recente di quello nella destinazione
+                #recente di quello nella destinazione, se lo e' lo copio
                 if [[ "$files" -nt "$destination"/$(basename "$files") ]]; then
-                    #parte del opzione conferma, entra solo se flagI e' uguale a 1
+                    #opzione conferma( solo se il flagI è uguale a 1)
                     if [[ $flagI == 1 ]]; then
-                        while [ "$conferma" != "n" ] && [ "$conferma" != "N" ] && [ "$conferma" != "y" ] && [ "$conferma" != "Y" ]; do
-                        echo "vuoi copiare il $files in $destination ? y/n"
-                        read conferma
-                    done
-                        if [[ ("$conferma" == y) || ("$conferma" == Y) ]]; then
-                            cp "$files" "$destination"
-                        fi
+                        while true; do
+                            echo "Vuoi copiare il file $files in $destination? y/n"
+                            read conferma
+                                case $conferma in
+                                    [Yy]* ) cp "$files" "$destination"; break;;
+                                    [Nn]* ) break;;
+                                        * ) echo "inserisci y(si) o n(no)!!!";;
+                                esac
+                        done
                     else
-                    #se la flag non è uguale a 1, copia senza chiedere conferma
+                        #se la flagI non è uguale a 1, copia senza chiedere conferma
                         cp "$files" "$destination"
                     fi
                 fi
@@ -109,18 +112,18 @@ fi
 #switch case per le opzioni -r -i
 case "$parametro" in
     #chiamo la funzione in maniera ricorsiva
-    [-R][-r]* )
-    copia "$dir1" "$dir2" "1" "0"
+    [-R][-r] )
+    copia "$dir1" "$dir2" "1" "0"; echo "test r"
     ;;
     
     #chiamo la funzione copia con la conferma
-    [-I][-i]* )
-    copia "$dir1" "$dir2" "0" "1"
+    [-I][-i] )
+    copia "$dir1" "$dir2" "0" "1"; echo "test i"
     ;;
     
     #chiamo la funzione con il prompt e la ricorsivita'
-    [-IR][-ir][-RI][-ri]* )
-    copia "$dir1" "$dir2" "1" "1"
+    -[Rr][Ii]* )
+    copia "$dir1" "$dir2" "1" "1"; echo "test ri"
     ;;
 
     #chiamo la funzione base
