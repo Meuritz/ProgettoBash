@@ -111,7 +111,7 @@ fi
 
 #switch case per le opzioni -r -i
 case "$parametro" in
-    #chiamo la funzione in maniera ricorsiva
+    #chiamo la funzione in modo ricorsivo
     [-R][-r] )
     copia "$dir1" "$dir2" "1" "0"; echo "test r"
     ;;
