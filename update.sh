@@ -10,10 +10,10 @@ copia(){
 
     #variabili locali
     source="$1"
-    destination="$2"
+    local destination="$2"
     flagR="$3"
     flagI="$4"
-
+    
     #ciclo for each per gli elementi presenti
     for files in "$source"/*
     do
@@ -46,7 +46,7 @@ copia(){
                             echo "Vuoi copiare il file $files in $destination? y/n"
                             read conferma
                                 case $conferma in
-                                    [Yy]* ) cp "$files" "$destination"; break;;
+                                    [Yy]* ) cp "$files" "$destination"; echo "Copia tipo 2: $files"; break;;
                                     [Nn]* ) break;;
                                         * ) echo "inserisci y(si) o n(no)!!!";;
                                 esac
@@ -113,17 +113,17 @@ fi
 case "$parametro" in
     #chiamo la funzione in modo ricorsivo
     [-R][-r] )
-    copia "$dir1" "$dir2" "1" "0"; echo "test r"
+    copia "$dir1" "$dir2" "1" "0"
     ;;
     
     #chiamo la funzione copia con la conferma
     [-I][-i] )
-    copia "$dir1" "$dir2" "0" "1"; echo "test i"
+    copia "$dir1" "$dir2" "0" "1"
     ;;
     
     #chiamo la funzione con il prompt e la ricorsivita'
     -[Rr][Ii]* )
-    copia "$dir1" "$dir2" "1" "1"; echo "test ri"
+    copia "$dir1" "$dir2" "1" "1"
     ;;
 
     #chiamo la funzione base
