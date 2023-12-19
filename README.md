@@ -8,9 +8,9 @@ non copia le directory se non specificato
 
 Parametri opzionali:
 
--i prima di copiare ogni file chiede all'utente se si vuole copiare il file
+-i) prima di copiare ogni file chiede all'utente se si vuole copiare il file
 
--r copia in modo ricorsivo (anche le cartelle, sotto cartelle...)
+-r) copia in modo ricorsivo (anche le cartelle, sotto cartelle...)
 
 Uso:
 
